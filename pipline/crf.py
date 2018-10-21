@@ -107,7 +107,7 @@ def apply_crf(inputpath):
                 break
         i = i + 1
 
-    test_path = '/home/zhangs/lyc/salt/test/images/'
+    test_path = '/home/zhangs/lyc/salt/data/test/images/'
 
     """
     visualizing the effect of applying CRF
@@ -156,5 +156,5 @@ def apply_crf(inputpath):
 
     df.to_csv('crf_correction_'+csv_path, index=False)
 
-path = 'single_res34_dw_816LB_submission.csv'
+path = 'single-small-6merge+0.csv'
 apply_crf(path)

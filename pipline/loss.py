@@ -57,14 +57,23 @@ def weighted_bce_dice_loss(y_true, y_pred):
     return loss
 
 def focal_loss(y_true, y_pred):
-    gamma = 2.
-    alpha = 0.75
+    gamma = 2
+    alpha = 0.25
     y_pred = K.clip(y_pred, 1e-6, 1 - 1e-6)
     p_t = tf.where(tf.equal(y_true, 1), y_pred, 1. - y_pred)
     alpha_t = tf.where(tf.equal(y_true, 1), K.ones_like(y_pred) * K.constant(alpha), K.ones_like(y_pred) * K.constant(1. - alpha))
     loss = K.mean(-1. * alpha_t * (1. - p_t)**gamma * K.log(p_t))
     return loss
-
+# def focal_loss(y_true, y_pred):
+#     gamma=2.0
+#     alpha=0.25
+#     pt_1 = tf.where(tf.equal(y_true, 1), y_pred, tf.ones_like(y_pred))
+#     pt_0 = tf.where(tf.equal(y_true, 0), y_pred, tf.zeros_like(y_pred))
+#
+#     pt_1 = K.clip(pt_1, 1e-3, .999)
+#     pt_0 = K.clip(pt_0, 1e-3, .999)
+#
+#     return -K.sum(alpha * K.pow(1. - pt_1, gamma) * K.log(pt_1))-K.sum((1-alpha) * K.pow( pt_0, gamma) * K.log(1. - pt_0))
 """
 Lovasz-Softmax and Jaccard hinge loss in Tensorflow
 Maxim Berman 2018 ESAT-PSI KU Leuven (MIT License)
@@ -298,7 +307,7 @@ def lovasz_hinge_flat(logits, labels):
         errors_sorted, perm = tf.nn.top_k(errors, k=tf.shape(errors)[0], name="descending_sort")
         gt_sorted = tf.gather(labelsf, perm)
         grad = lovasz_grad(gt_sorted)
-        loss = tf.tensordot(tf.nn.relu(errors_sorted), tf.stop_gradient(grad), 1, name="loss_non_void")
+        loss = tf.tensordot(tf.nn.elu(errors_sorted)+1, tf.stop_gradient(grad), 1, name="loss_non_void") #modified
         #loss = tf.reduce_sum(tf.multiply(tf.nn.relu(errors_sorted), tf.stop_gradient(grad), name="loss_non_void"))
         return loss
 
